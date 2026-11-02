@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, dynamic>> products = [
     {
       'name': 'Canon EOS M50',
-      'category': 'Camera',
+      'category': 'Electronics',
       'price': '75.000',
       'location': 'Surabaya',
       'image':
@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     },
     {
       'name': 'Mountain Bike',
-      'category': 'Bicycle',
+      'category': 'Vehicles',
       'price': '50.000',
       'location': 'Malang',
       'image':
@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     },
     {
       'name': 'Camping Tent',
-      'category': 'Outdoor',
+      'category': 'Sports',
       'price': '40.000',
       'location': 'Surabaya',
       'image':
@@ -70,16 +70,25 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredProducts = products.where((product) {
-      return product['name'].toLowerCase().contains(searchQuery.toLowerCase());
+      final matchesSearch = product['name'].toString().toLowerCase().contains(
+        searchQuery.toLowerCase(),
+      );
+
+      final selectedCategoryName = categories[selectedCategory];
+
+      final matchesCategory =
+          selectedCategoryName == 'All' ||
+          product['category'] == selectedCategoryName;
+
+      return matchesSearch && matchesCategory;
     }).toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: SafeArea(
         child: Column(
           children: [
-            // HEADER DAN SEARCH BAR (TETAP DI ATAS)
+            // HEADER DAN SEARCH BAR
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Column(
@@ -120,9 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 25),
-
                   TextField(
                     controller: searchController,
                     onChanged: (value) {
@@ -265,7 +272,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() {
+                            selectedCategory = 0;
+                            searchController.clear();
+                            searchQuery = '';
+                          });
+                        },
                         child: const Text(
                           'See All',
                           style: TextStyle(
@@ -357,7 +370,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                               ),
-
                               Padding(
                                 padding: const EdgeInsets.all(10),
                                 child: Column(
@@ -436,7 +448,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // BOTTOM NAVIGATION (TETAP DI BAWAH)
+      // BOTTOM NAVIGATION
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: orange,
