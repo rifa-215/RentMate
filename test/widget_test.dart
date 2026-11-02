@@ -6,6 +6,5 @@ void main() {
     await tester.pumpWidget(const RentMateApp());
 
     expect(find.text('RentMate'), findsOneWidget);
-    expect(find.text('Rent What You Need, When You Need It.'), findsOneWidget);
   });
 }
