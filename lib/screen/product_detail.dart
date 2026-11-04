@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'chat_screen.dart';
+import 'rental_request.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Map<String, dynamic> product;
@@ -261,9 +262,11 @@ class ProductDetailScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: product['isAvailable'] == true
                         ? () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Rental feature is coming soon!'),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RentalRequestScreen(product: product),
                               ),
                             );
                           }
