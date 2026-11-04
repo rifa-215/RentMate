@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class FavoritesScreen extends StatelessWidget {
   final List<Map<String, dynamic>> favoriteProducts;
+  final Function(Map<String, dynamic>) onRemoveFavorite;
 
-  const FavoritesScreen({super.key, required this.favoriteProducts});
+  const FavoritesScreen({
+    super.key,
+    required this.favoriteProducts,
+    required this.onRemoveFavorite,
+  });
 
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
@@ -76,28 +81,58 @@ class FavoritesScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(16),
-                                ),
-                                child: Image.network(
-                                  product['image'],
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: const Color(0xFFFFF3E8),
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.image_not_supported,
-                                          color: orange,
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
+                                    child: Image.network(
+                                      product['image'],
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              color: const Color(0xFFFFF3E8),
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.image_not_supported,
+                                                  color: orange,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                    ),
+                                  ),
+
+                                  // REMOVE FAVORITE BUTTON
+                                  Positioned(
+                                    top: 10,
+                                    right: 10,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        onRemoveFavorite(product);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(7),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.favorite,
+                                          color: Colors.red,
+                                          size: 19,
                                         ),
                                       ),
-                                    );
-                                  },
-                                ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+
                             Padding(
                               padding: const EdgeInsets.all(10),
                               child: Column(

@@ -29,6 +29,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void removeFavorite(Map<String, dynamic> product) {
+    setState(() {
+      favoriteProducts.remove(product['name'].toString());
+    });
+  }
+
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
 
@@ -552,6 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
             favoriteProducts: products.where((product) {
               return favoriteProducts.contains(product['name'].toString());
             }).toList(),
+            onRemoveFavorite: removeFavorite,
           ),
         ],
       ),
