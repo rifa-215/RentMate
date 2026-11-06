@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'product_detail.dart';
 import 'favorite.dart';
 import 'my_rental.dart';
+import 'profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -555,18 +556,31 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           // HALAMAN FAVORITES
-          // HALAMAN FAVORITES
           FavoritesScreen(
             favoriteProducts: products.where((product) {
               return favoriteProducts.contains(product['name'].toString());
             }).toList(),
             onRemoveFavorite: removeFavorite,
+            onBack: () {
+              setState(() {
+                selectedIndex = 0;
+              });
+            },
           ),
 
           // HALAMAN MY RENTALS
-          const MyRentalsScreen(),
+          MyRentalsScreen(
+            onBack: () {
+              setState(() {
+                selectedIndex = 0;
+              });
+            },
+          ),
+          // HALAMAN PROFILE
+          const ProfileScreen(),
         ],
       ),
+
       // BOTTOM NAVIGATION
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -574,15 +588,9 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.grey,
         currentIndex: selectedIndex,
         onTap: (index) {
-          if (index == 0 || index == 1 || index == 2) {
-            setState(() {
-              selectedIndex = index;
-            });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Profile feature is coming soon!')),
-            );
-          }
+          setState(() {
+            selectedIndex = index;
+          });
         },
         items: const [
           BottomNavigationBarItem(

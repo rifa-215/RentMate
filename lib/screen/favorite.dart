@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class FavoritesScreen extends StatelessWidget {
   final List<Map<String, dynamic>> favoriteProducts;
   final Function(Map<String, dynamic>) onRemoveFavorite;
+  final VoidCallback onBack;
 
   const FavoritesScreen({
     super.key,
     required this.favoriteProducts,
     required this.onRemoveFavorite,
+    required this.onBack,
   });
 
   static const Color orange = Color(0xFFFF8A00);
@@ -19,18 +21,28 @@ class FavoritesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 25, 20, 20),
-            child: Text(
-              'My Favorites',
-              style: TextStyle(
-                fontSize: 23,
-                fontWeight: FontWeight.bold,
-                color: black,
-              ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 25, 20, 20),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: onBack,
+                  icon: const Icon(Icons.arrow_back, color: black),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'My Favorites',
+                  style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                    color: black,
+                  ),
+                ),
+              ],
             ),
           ),
-
           Expanded(
             child: favoriteProducts.isEmpty
                 ? const Center(
@@ -106,8 +118,6 @@ class FavoritesScreen extends StatelessWidget {
                                           },
                                     ),
                                   ),
-
-                                  // REMOVE FAVORITE BUTTON
                                   Positioned(
                                     top: 10,
                                     right: 10,
@@ -132,7 +142,6 @@ class FavoritesScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-
                             Padding(
                               padding: const EdgeInsets.all(10),
                               child: Column(

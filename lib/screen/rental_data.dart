@@ -21,4 +21,11 @@ class RentalData {
       'status': 'Pending',
     });
   }
+
+  // Mengubah status permintaan rental
+  static void updateStatus(int index, String newStatus) {
+    if (index >= 0 && index < rentals.length) {
+      rentals[index]['status'] = newStatus;
+    }
+  }
 }
