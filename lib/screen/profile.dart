@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatelessWidget {
+import 'create_store.dart';
+import 'store_data.dart';
+import 'store_dashboard.dart';
+
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool showStoreDashboard = false;
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
 
@@ -79,11 +89,20 @@ class ProfileScreen extends StatelessWidget {
                     title: 'Toko Saya',
                     subtitle: 'Mulai menyewakan barangmu',
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Create Store feature coming soon!'),
-                        ),
-                      );
+                      if (StoreData.storeCreated) {
+                        setState(() {
+                          showStoreDashboard = true;
+                        });
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CreateStoreScreen(),
+                          ),
+                        ).then((_) {
+                          setState(() {});
+                        });
+                      }
                     },
                   ),
 

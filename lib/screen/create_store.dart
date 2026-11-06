@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'store_data.dart';
+
 class CreateStoreScreen extends StatefulWidget {
   const CreateStoreScreen({super.key});
 
@@ -122,12 +124,19 @@ class _CreateStoreScreenState extends State<CreateStoreScreen> {
                     return;
                   }
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Informasi toko berhasil diisi!'),
-                    ),
+                  StoreData.createStore(
+                    name: storeNameController.text.trim(),
+                    desc: descriptionController.text.trim(),
+                    storeAddress: addressController.text.trim(),
                   );
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Toko berhasil dibuat!')),
+                  );
+
+                  Navigator.pop(context);
                 },
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: orange,
                   foregroundColor: Colors.white,
