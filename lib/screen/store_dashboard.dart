@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'store_data.dart';
+import 'owner_request.dart';
+import 'my_items.dart';
 
 class StoreDashboardScreen extends StatelessWidget {
   final VoidCallback onBack;
@@ -172,7 +174,14 @@ class StoreDashboardScreen extends StatelessWidget {
                       icon: Icons.inventory_2_outlined,
                       title: 'My Items',
                       subtitle: 'Manage your rental products',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MyItemsScreen(),
+                          ),
+                        );
+                      },
                     ),
                     _menuCard(
                       icon: Icons.add_box_outlined,
@@ -184,7 +193,14 @@ class StoreDashboardScreen extends StatelessWidget {
                       icon: Icons.assignment_outlined,
                       title: 'Rental Requests',
                       subtitle: 'Check incoming rental requests',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const OwnerRequestsScreen(),
+                          ),
+                        );
+                      },
                     ),
                     _menuCard(
                       icon: Icons.receipt_long_outlined,
