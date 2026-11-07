@@ -6,6 +6,8 @@ import 'my_rental.dart';
 import 'profile.dart';
 import 'product_data.dart';
 
+import 'dart:io';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -351,26 +353,58 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 const BorderRadius.vertical(
                                                   top: Radius.circular(16),
                                                 ),
-                                            child: Image.network(
-                                              product['image'],
-                                              width: double.infinity,
-                                              fit: BoxFit.cover,
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                    return Container(
-                                                      color: const Color(
-                                                        0xFFFFF3E8,
-                                                      ),
-                                                      child: const Center(
-                                                        child: Icon(
-                                                          Icons
-                                                              .image_not_supported,
-                                                          color: orange,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                            ),
+                                            child:
+                                                product['image']
+                                                    .toString()
+                                                    .startsWith('http')
+                                                ? Image.network(
+                                                    product['image'],
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return Container(
+                                                            color: const Color(
+                                                              0xFFFFF3E8,
+                                                            ),
+                                                            child: const Center(
+                                                              child: Icon(
+                                                                Icons
+                                                                    .image_not_supported,
+                                                                color: orange,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                  )
+                                                : Image.file(
+                                                    File(product['image']),
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return Container(
+                                                            color: const Color(
+                                                              0xFFFFF3E8,
+                                                            ),
+                                                            child: const Center(
+                                                              child: Icon(
+                                                                Icons
+                                                                    .image_not_supported,
+                                                                color: orange,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                  ),
                                           ),
                                           Positioned(
                                             top: 10,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'product_data.dart';
 
+import 'dart:io';
+
 class MyItemsScreen extends StatefulWidget {
   const MyItemsScreen({super.key});
 
@@ -228,20 +230,39 @@ class _MyItemsScreenState extends State<MyItemsScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          product['image'],
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 90,
-                              height: 90,
-                              color: Colors.grey.shade200,
-                              child: const Icon(Icons.image_not_supported),
-                            );
-                          },
-                        ),
+                        child: product['image'].toString().startsWith('http')
+                            ? Image.network(
+                                product['image'],
+                                width: 90,
+                                height: 90,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 90,
+                                    height: 90,
+                                    color: Colors.grey.shade200,
+                                    child: const Icon(
+                                      Icons.image_not_supported,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Image.file(
+                                File(product['image']),
+                                width: 90,
+                                height: 90,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 90,
+                                    height: 90,
+                                    color: Colors.grey.shade200,
+                                    child: const Icon(
+                                      Icons.image_not_supported,
+                                    ),
+                                  );
+                                },
+                              ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(

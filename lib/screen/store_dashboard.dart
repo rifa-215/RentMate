@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'store_data.dart';
 import 'owner_request.dart';
 import 'my_items.dart';
+import 'add_item.dart';
 
 class StoreDashboardScreen extends StatelessWidget {
   final VoidCallback onBack;
@@ -187,7 +188,14 @@ class StoreDashboardScreen extends StatelessWidget {
                       icon: Icons.add_box_outlined,
                       title: 'Add Item',
                       subtitle: 'Add a new rental product',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AddItemScreen(),
+                          ),
+                        );
+                      },
                     ),
                     _menuCard(
                       icon: Icons.assignment_outlined,
