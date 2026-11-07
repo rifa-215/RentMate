@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'store_data.dart';
 
 class StoreDashboardScreen extends StatelessWidget {
-  const StoreDashboardScreen({super.key});
+  final VoidCallback onBack;
+
+  const StoreDashboardScreen({super.key, required this.onBack});
 
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
@@ -33,6 +35,16 @@ class StoreDashboardScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
+                        IconButton(
+                          onPressed: onBack,
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        const SizedBox(width: 12),
                         const Icon(
                           Icons.storefront_outlined,
                           color: Colors.white,

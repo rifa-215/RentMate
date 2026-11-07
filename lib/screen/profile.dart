@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'store_dashboard.dart';
+
 import 'create_store.dart';
 import 'store_data.dart';
-import 'store_dashboard.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -18,159 +19,179 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          // HEADER PROFILE
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 25, 20, 20),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: const Text(
-                'My Profile',
-                style: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.bold,
-                  color: black,
-                ),
-              ),
-            ),
-          ),
-
-          // ISI PROFILE
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 25),
-
-                  // INFORMASI PENGGUNA
-                  Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 32,
-                        backgroundColor: Color(0xFFFFF3E8),
-                        child: Icon(Icons.person, size: 38, color: orange),
+    return showStoreDashboard
+        ? StoreDashboardScreen(
+            onBack: () {
+              setState(() {
+                showStoreDashboard = false;
+              });
+            },
+          )
+        : SafeArea(
+            child: Column(
+              children: [
+                // HEADER PROFILE
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 25, 20, 20),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: const Text(
+                      'My Profile',
+                      style: TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: black,
                       ),
-                      const SizedBox(width: 15),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  ),
+                ),
+
+                // ISI PROFILE
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 25),
+
+                        // INFORMASI PENGGUNA
+                        Row(
                           children: [
-                            Text(
-                              'User RentMate',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
+                            const CircleAvatar(
+                              radius: 32,
+                              backgroundColor: Color(0xFFFFF3E8),
+                              child: Icon(
+                                Icons.person,
+                                size: 38,
+                                color: orange,
                               ),
                             ),
-                            SizedBox(height: 5),
-                            Text(
-                              'user@email.com',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 13,
+                            const SizedBox(width: 15),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'User RentMate',
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'user@email.com',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                            const Icon(Icons.chevron_right),
                           ],
                         ),
-                      ),
-                      const Icon(Icons.chevron_right),
-                    ],
-                  ),
 
-                  const SizedBox(height: 25),
+                        const SizedBox(height: 25),
 
-                  // TOKO SAYA
-                  _profileMenu(
-                    icon: Icons.store_outlined,
-                    title: 'Toko Saya',
-                    subtitle: 'Mulai menyewakan barangmu',
-                    onTap: () {
-                      if (StoreData.storeCreated) {
-                        setState(() {
-                          showStoreDashboard = true;
-                        });
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CreateStoreScreen(),
-                          ),
-                        ).then((_) {
-                          setState(() {});
-                        });
-                      }
-                    },
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // RIWAYAT PENYEWAAN
-                  _profileMenu(
-                    icon: Icons.receipt_long_outlined,
-                    title: 'Riwayat Penyewaan',
-                    subtitle: 'Lihat transaksi penyewaanmu',
-                    onTap: () {},
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  _profileMenu(
-                    icon: Icons.favorite_border,
-                    title: 'Favorites',
-                    subtitle: 'Barang favoritmu',
-                    onTap: () {},
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  _profileMenu(
-                    icon: Icons.settings_outlined,
-                    title: 'Pengaturan',
-                    subtitle: 'Atur akun dan preferensi',
-                    onTap: () {},
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  _profileMenu(
-                    icon: Icons.help_outline,
-                    title: 'Bantuan',
-                    subtitle: 'FAQ dan pusat bantuan',
-                    onTap: () {},
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // BANNER BUAT TOKO
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF3E8),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.storefront, size: 45, color: orange),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Punya barang untuk disewakan?',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
+                        // TOKO SAYA
+                        _profileMenu(
+                          icon: Icons.store_outlined,
+                          title: 'Toko Saya',
+                          subtitle: 'Mulai menyewakan barangmu',
+                          onTap: () {
+                            if (StoreData.storeCreated) {
+                              setState(() {
+                                showStoreDashboard = true;
+                              });
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CreateStoreScreen(),
                                 ),
+                              ).then((_) {
+                                setState(() {});
+                              });
+                            }
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // RIWAYAT PENYEWAAN
+                        _profileMenu(
+                          icon: Icons.receipt_long_outlined,
+                          title: 'Riwayat Penyewaan',
+                          subtitle: 'Lihat transaksi penyewaanmu',
+                          onTap: () {},
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _profileMenu(
+                          icon: Icons.favorite_border,
+                          title: 'Favorites',
+                          subtitle: 'Barang favoritmu',
+                          onTap: () {},
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _profileMenu(
+                          icon: Icons.settings_outlined,
+                          title: 'Pengaturan',
+                          subtitle: 'Atur akun dan preferensi',
+                          onTap: () {},
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _profileMenu(
+                          icon: Icons.help_outline,
+                          title: 'Bantuan',
+                          subtitle: 'FAQ dan pusat bantuan',
+                          onTap: () {},
+                        ),
+
+                        const SizedBox(height: 25),
+
+                        // BANNER BUAT TOKO
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3E8),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.storefront,
+                                size: 45,
+                                color: orange,
                               ),
-                              SizedBox(height: 5),
-                              Text(
-                                'Buat toko dan mulai sewakan barangmu!',
-                                style: TextStyle(fontSize: 11),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Punya barang untuk disewakan?',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      'Buat toko dan mulai sewakan barangmu!',
+                                      style: TextStyle(fontSize: 11),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -178,13 +199,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   Widget _profileMenu({
