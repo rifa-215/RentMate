@@ -13,6 +13,9 @@ class _OwnerRequestsScreenState extends State<OwnerRequestsScreen> {
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
 
+  String selectedFilter = 'All';
+
+  final List<String> filters = ['All', 'Pending', 'Approved', 'Rejected'];
   String formatRupiah(int price) {
     return 'Rp${price.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (match) => '${match[1]}.')}';
   }
@@ -36,50 +39,121 @@ class _OwnerRequestsScreenState extends State<OwnerRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rentals = RentalData.rentals;
+    final rentals = RentalData.rentals.where((rental) {
+      if (selectedFilter == 'All') {
+        return true;
+      }
+
+      return rental['status'] == selectedFilter;
+    }).toList();
 
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 25, 20, 20),
-            child: Text(
-              'Owner Requests',
-              style: TextStyle(
-                fontSize: 23,
-                fontWeight: FontWeight.bold,
-                color: black,
-              ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 20, 20, 20),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.arrow_back, color: black),
+                ),
+                const SizedBox(width: 5),
+                const Text(
+                  'Owner Requests',
+                  style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                    color: black,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 36,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              scrollDirection: Axis.horizontal,
+              itemCount: filters.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final filter = filters[index];
+                final isSelected = selectedFilter == filter;
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedFilter = filter;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isSelected ? orange : const Color(0xFFFFF3E8),
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Text(
+                      filter,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isSelected ? Colors.white : black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 
+          const SizedBox(height: 15),
+
           Expanded(
             child: rentals.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inbox_outlined,
-                          size: 75,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(height: 15),
-                        Text(
-                          'No Requests Yet',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: black,
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.inbox_outlined,
+                            size: 65,
+                            color: Colors.grey,
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Rental requests will appear here.',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
+
+                          const SizedBox(height: 18),
+
+                          const Text(
+                            'No Requests Yet',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              color: black,
+                            ),
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          const SizedBox(
+                            width: 250,
+                            child: Text(
+                              'Rental requests will appear here.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 : ListView.builder(

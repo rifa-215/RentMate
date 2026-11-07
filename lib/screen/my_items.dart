@@ -4,6 +4,8 @@ import 'product_data.dart';
 
 import 'dart:io';
 
+import 'package:image_picker/image_picker.dart';
+
 class MyItemsScreen extends StatefulWidget {
   const MyItemsScreen({super.key});
 
@@ -79,86 +81,170 @@ class _MyItemsScreenState extends State<MyItemsScreen> {
     final categoryController = TextEditingController(text: product['category']);
     final priceController = TextEditingController(text: product['price']);
     final locationController = TextEditingController(text: product['location']);
-    final imageController = TextEditingController(text: product['image']);
+
+    File? selectedImage;
 
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Edit Item'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Item Name'),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final currentImage = selectedImage?.path ?? product['image'];
+
+            Widget imagePreview;
+
+            if (currentImage.toString().startsWith('http')) {
+              imagePreview = Image.network(
+                currentImage,
+                width: 120,
+                height: 120,
+                fit: BoxFit.cover,
+              );
+            } else {
+              imagePreview = Image.file(
+                File(currentImage),
+                width: 120,
+                height: 120,
+                fit: BoxFit.cover,
+              );
+            }
+
+            return AlertDialog(
+              title: const Text('Edit Item'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        final XFile? image = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                        );
+
+                        if (image != null) {
+                          setDialogState(() {
+                            selectedImage = File(image.path);
+                          });
+                        }
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF3E8),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            imagePreview,
+                            Container(
+                              color: Colors.black.withValues(alpha: 0.35),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.camera_alt_outlined,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'Change Photo',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Item Name'),
+                    ),
+
+                    TextField(
+                      controller: categoryController,
+                      decoration: const InputDecoration(labelText: 'Category'),
+                    ),
+
+                    TextField(
+                      controller: priceController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Price per Day',
+                      ),
+                    ),
+
+                    TextField(
+                      controller: locationController,
+                      decoration: const InputDecoration(labelText: 'Location'),
+                    ),
+                  ],
                 ),
-                TextField(
-                  controller: categoryController,
-                  decoration: const InputDecoration(labelText: 'Category'),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Cancel'),
                 ),
-                TextField(
-                  controller: priceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Price per Day'),
-                ),
-                TextField(
-                  controller: locationController,
-                  decoration: const InputDecoration(labelText: 'Location'),
-                ),
-                TextField(
-                  controller: imageController,
-                  decoration: const InputDecoration(labelText: 'Image URL'),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: orange,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (nameController.text.trim().isEmpty ||
+                        categoryController.text.trim().isEmpty ||
+                        priceController.text.trim().isEmpty ||
+                        locationController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please complete all item details!'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    setState(() {
+                      ProductData.products[index]['name'] = nameController.text
+                          .trim();
+
+                      ProductData.products[index]['category'] =
+                          categoryController.text.trim();
+
+                      ProductData.products[index]['price'] = priceController
+                          .text
+                          .trim();
+
+                      ProductData.products[index]['location'] =
+                          locationController.text.trim();
+
+                      if (selectedImage != null) {
+                        ProductData.products[index]['image'] =
+                            selectedImage!.path;
+                      }
+                    });
+
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Save Changes'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: orange,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                if (nameController.text.trim().isEmpty ||
-                    categoryController.text.trim().isEmpty ||
-                    priceController.text.trim().isEmpty ||
-                    locationController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please complete all item details!'),
-                    ),
-                  );
-                  return;
-                }
-
-                setState(() {
-                  ProductData.products[index]['name'] = nameController.text
-                      .trim();
-                  ProductData.products[index]['category'] = categoryController
-                      .text
-                      .trim();
-                  ProductData.products[index]['price'] = priceController.text
-                      .trim();
-                  ProductData.products[index]['location'] = locationController
-                      .text
-                      .trim();
-                  ProductData.products[index]['image'] = imageController.text
-                      .trim();
-                });
-
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Save Changes'),
-            ),
-          ],
+            );
+          },
         );
       },
     );

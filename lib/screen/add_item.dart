@@ -194,7 +194,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF3E8),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: orange.withOpacity(0.5)),
+                    border: Border.all(color: orange.withValues(alpha: 0.5)),
                   ),
                   child: selectedImage != null
                       ? ClipRRect(
