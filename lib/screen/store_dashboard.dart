@@ -5,6 +5,8 @@ import 'owner_request.dart';
 import 'my_items.dart';
 import 'add_item.dart';
 import 'transaction_history.dart';
+import 'edit_store.dart';
+import 'store_preview.dart';
 
 class StoreDashboardScreen extends StatelessWidget {
   final VoidCallback onBack;
@@ -181,6 +183,32 @@ class StoreDashboardScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const MyItemsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _menuCard(
+                      icon: Icons.storefront_outlined,
+                      title: 'Edit Store',
+                      subtitle: 'Update your store information',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const EditStoreScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _menuCard(
+                      icon: Icons.visibility_outlined,
+                      title: 'Store Preview',
+                      subtitle: 'Preview how customers see your store',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const StorePreviewScreen(),
                           ),
                         );
                       },
