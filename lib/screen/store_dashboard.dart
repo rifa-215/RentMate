@@ -4,6 +4,7 @@ import 'store_data.dart';
 import 'owner_request.dart';
 import 'my_items.dart';
 import 'add_item.dart';
+import 'transaction_history.dart';
 
 class StoreDashboardScreen extends StatelessWidget {
   final VoidCallback onBack;
@@ -214,7 +215,15 @@ class StoreDashboardScreen extends StatelessWidget {
                       icon: Icons.receipt_long_outlined,
                       title: 'Transaction History',
                       subtitle: 'View your store transactions',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const TransactionHistoryScreen(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
