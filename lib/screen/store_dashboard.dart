@@ -7,6 +7,8 @@ import 'add_item.dart';
 import 'transaction_history.dart';
 import 'edit_store.dart';
 import 'store_preview.dart';
+import 'product_data.dart';
+import 'rental_data.dart';
 
 class StoreDashboardScreen extends StatelessWidget {
   final VoidCallback onBack;
@@ -19,6 +21,11 @@ class StoreDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final totalItems = ProductData.products.length;
+
+    final pendingRequests = RentalData.rentals.where((rental) {
+      return rental['status'] == 'Pending';
+    }).length;
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       body: SafeArea(
@@ -133,7 +140,7 @@ class StoreDashboardScreen extends StatelessWidget {
                       child: _statCard(
                         icon: Icons.inventory_2_outlined,
                         title: 'My Items',
-                        value: '0',
+                        value: totalItems.toString(),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -141,7 +148,7 @@ class StoreDashboardScreen extends StatelessWidget {
                       child: _statCard(
                         icon: Icons.assignment_outlined,
                         title: 'Requests',
-                        value: '0',
+                        value: pendingRequests.toString(),
                       ),
                     ),
                   ],

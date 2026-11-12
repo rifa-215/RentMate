@@ -5,6 +5,8 @@ import 'favorite.dart';
 import 'my_rental.dart';
 import 'profile.dart';
 import 'product_data.dart';
+import 'notification.dart';
+import 'notification_data.dart';
 
 import 'dart:io';
 
@@ -116,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ],
                           ),
+
                           Container(
                             width: 45,
                             height: 45,
@@ -123,10 +126,71 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: const Color(0xFFFFF3E8),
                               borderRadius: BorderRadius.circular(15),
                             ),
-                            child: const Icon(
-                              Icons.notifications_none_rounded,
-                              color: orange,
-                              size: 27,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                        ) => const NotificationScreen(),
+                                        transitionsBuilder:
+                                            (
+                                              context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child,
+                                            ) {
+                                              return child;
+                                            },
+                                      ),
+                                    ).then((_) {
+                                      setState(() {});
+                                    });
+                                  },
+                                  icon: const Icon(
+                                    Icons.notifications_none_rounded,
+                                    color: orange,
+                                    size: 27,
+                                  ),
+                                ),
+                                if (NotificationData.unreadCountFor('renter') >
+                                    0)
+                                  Positioned(
+                                    right: 7,
+                                    top: 7,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(3),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 17,
+                                        minHeight: 17,
+                                      ),
+                                      child: Text(
+                                        NotificationData.unreadCountFor(
+                                                  'renter',
+                                                ) >
+                                                9
+                                            ? '9+'
+                                            : '${NotificationData.unreadCountFor('renter')}',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         ],

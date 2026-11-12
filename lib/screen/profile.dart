@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'store_dashboard.dart';
-
 import 'create_store.dart';
 import 'store_data.dart';
+import 'user_data.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,11 +14,14 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool showStoreDashboard = false;
+
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
 
   @override
   Widget build(BuildContext context) {
+    final user = UserData.currentUser;
+
     return showStoreDashboard
         ? StoreDashboardScreen(
             onBack: () {
@@ -68,21 +71,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             const SizedBox(width: 15),
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'User RentMate',
-                                    style: TextStyle(
+                                    user?['name'] ?? 'User RentMate',
+                                    style: const TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   Text(
-                                    'user@email.com',
-                                    style: TextStyle(
+                                    user?['email'] ?? 'user@email.com',
+                                    style: const TextStyle(
                                       color: Colors.grey,
                                       fontSize: 13,
                                     ),
@@ -90,8 +93,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(Icons.chevron_right),
                           ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // DETAIL PENGGUNA
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3E8),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Personal Information',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: black,
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              _userInfo(
+                                Icons.phone_outlined,
+                                'Phone Number',
+                                user?['phone'] ?? '-',
+                              ),
+                              const SizedBox(height: 12),
+                              _userInfo(
+                                Icons.location_on_outlined,
+                                'Address',
+                                user?['address'] ?? '-',
+                              ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(height: 25),
@@ -122,7 +161,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         const SizedBox(height: 12),
 
-                        // RIWAYAT PENYEWAAN
                         _profileMenu(
                           icon: Icons.receipt_long_outlined,
                           title: 'Riwayat Penyewaan',
@@ -203,6 +241,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           );
+  }
+
+  Widget _userInfo(IconData icon, String title, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: orange, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(color: Colors.grey, fontSize: 11),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: black,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _profileMenu({

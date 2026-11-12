@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
 import 'rental_data.dart';
+import 'review_screen.dart';
 
-class MyRentalsScreen extends StatelessWidget {
+class MyRentalsScreen extends StatefulWidget {
   final VoidCallback onBack;
 
   const MyRentalsScreen({super.key, required this.onBack});
 
+  @override
+  State<MyRentalsScreen> createState() => _MyRentalsScreenState();
+}
+
+class _MyRentalsScreenState extends State<MyRentalsScreen> {
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
 
@@ -42,7 +48,7 @@ class MyRentalsScreen extends StatelessWidget {
             child: Row(
               children: [
                 IconButton(
-                  onPressed: onBack,
+                  onPressed: widget.onBack,
                   icon: const Icon(Icons.arrow_back, color: black),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -187,8 +193,143 @@ class MyRentalsScreen extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+
+                                if (status == 'Approved' &&
+                                    rental['hasReviewed'] != true) ...[
+                                  const SizedBox(height: 15),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 45,
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ReviewScreen(
+                                              productName: product['name']
+                                                  .toString(),
+                                              rentalIndex: index,
+                                            ),
+                                          ),
+                                        );
+
+                                        setState(() {});
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: orange,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Give Review',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+
+                                if (rental['hasReviewed'] == true) ...[
+                                  const SizedBox(height: 15),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: Colors.green,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        'Reviewed',
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        '${rental['rating']} / 5 ⭐',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ],
                             ),
+                            if (status == 'Approved' &&
+                                rental['hasReviewed'] != true) ...[
+                              const SizedBox(height: 15),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 45,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ReviewScreen(
+                                          productName: product['name']
+                                              .toString(),
+                                          rentalIndex: index,
+                                        ),
+                                      ),
+                                    );
+
+                                    setState(() {});
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: orange,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Give Review',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+
+                            if (rental['hasReviewed'] == true) ...[
+                              const SizedBox(height: 15),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Reviewed',
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    '${rental['rating']} / 5 ⭐',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       );

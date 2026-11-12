@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'rental_confirm.dart';
 import 'rental_data.dart';
+import 'notification_data.dart';
 
 class RentalRequestScreen extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -18,6 +19,10 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
 
   DateTime? startDate;
   DateTime? endDate;
+
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final addressController = TextEditingController();
 
   String? deliveryMethod;
   String? paymentMethod;
@@ -83,12 +88,23 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final canSubmit =
         startDate != null &&
         endDate != null &&
         deliveryMethod != null &&
-        paymentMethod != null;
+        paymentMethod != null &&
+        nameController.text.trim().isNotEmpty &&
+        phoneController.text.trim().isNotEmpty &&
+        addressController.text.trim().isNotEmpty;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -133,6 +149,72 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // CUSTOMER INFORMATION
+                    const Text(
+                      'Customer Information',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: black,
+                      ),
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Full Name',
+                        prefixIcon: const Icon(
+                          Icons.person_outline,
+                          color: orange,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onChanged: (_) => setState(() {}),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'Phone Number',
+                        prefixIcon: const Icon(
+                          Icons.phone_outlined,
+                          color: orange,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onChanged: (_) => setState(() {}),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: addressController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Address',
+                        alignLabelWithHint: true,
+                        prefixIcon: const Icon(
+                          Icons.location_on_outlined,
+                          color: orange,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onChanged: (_) => setState(() {}),
                     ),
 
                     const SizedBox(height: 30),
@@ -339,6 +421,12 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
                             deliveryMethod: deliveryMethod!,
                             paymentMethod: paymentMethod!,
                             totalPrice: totalPrice,
+                            customerName: nameController.text.trim(),
+                            customerPhone: phoneController.text.trim(),
+                            customerAddress: addressController.text.trim(),
+                          );
+                          debugPrint(
+                            'JUMLAH NOTIFIKASI: ${NotificationData.notifications.length}',
                           );
 
                           // Buka halaman konfirmasi

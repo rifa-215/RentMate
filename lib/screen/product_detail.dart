@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'chat_screen.dart';
 import 'rental_request.dart';
+import 'rental_data.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Map<String, dynamic> product;
@@ -10,6 +13,210 @@ class ProductDetailScreen extends StatelessWidget {
 
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
+
+  Widget buildProductImage() {
+    final image = product['image'].toString();
+
+    if (image.startsWith('http')) {
+      return Image.network(
+        image,
+        width: double.infinity,
+        height: 280,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return imagePlaceholder();
+        },
+      );
+    }
+
+    return Image.file(
+      File(image),
+      width: double.infinity,
+      height: 280,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return imagePlaceholder();
+      },
+    );
+  }
+
+  Widget imagePlaceholder() {
+    return Container(
+      height: 280,
+      color: const Color(0xFFFFF3E8),
+      child: const Center(
+        child: Icon(Icons.image_not_supported, color: orange, size: 50),
+      ),
+    );
+  }
+
+  Widget buildStars(double rating, {double size = 20}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (index) {
+        return Icon(
+          index < rating.round() ? Icons.star : Icons.star_border,
+          color: orange,
+          size: size,
+        );
+      }),
+    );
+  }
+
+  Widget buildCustomerReviews() {
+    final productReviews = RentalData.rentals.where((rental) {
+      final reviewedProduct = rental['product'] as Map<String, dynamic>?;
+
+      return rental['hasReviewed'] == true &&
+          reviewedProduct?['name'] == product['name'];
+    }).toList();
+
+    final averageRating = productReviews.isEmpty
+        ? 0.0
+        : productReviews.fold<double>(
+                0,
+                (sum, review) =>
+                    sum + ((review['rating'] as num?)?.toDouble() ?? 0),
+              ) /
+              productReviews.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Customer Reviews',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: black,
+          ),
+        ),
+
+        const SizedBox(height: 15),
+
+        if (productReviews.isNotEmpty) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF3E8),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  averageRating.toStringAsFixed(1),
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: black,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    buildStars(averageRating, size: 20),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${productReviews.length} review(s)',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          ...productReviews.map((review) {
+            final rating = (review['rating'] as num?)?.toDouble() ?? 0;
+
+            return Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8F8F8),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 17,
+                        backgroundColor: Color(0xFFFFF3E8),
+                        child: Icon(Icons.person, color: orange, size: 19),
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      const Expanded(
+                        child: Text(
+                          'Customer',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: black,
+                          ),
+                        ),
+                      ),
+
+                      buildStars(rating, size: 16),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    review['review']?.toString() ?? '',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ] else
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F8F8),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: const Column(
+              children: [
+                Icon(Icons.rate_review_outlined, size: 40, color: Colors.grey),
+                SizedBox(height: 10),
+                Text(
+                  'No Reviews Yet',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: black,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  'Be the first to review this product!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,25 +242,7 @@ class ProductDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // PRODUCT IMAGE
-            Image.network(
-              product['image'],
-              width: double.infinity,
-              height: 280,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 280,
-                  color: const Color(0xFFFFF3E8),
-                  child: const Center(
-                    child: Icon(
-                      Icons.image_not_supported,
-                      color: orange,
-                      size: 50,
-                    ),
-                  ),
-                );
-              },
-            ),
+            buildProductImage(),
 
             Padding(
               padding: const EdgeInsets.all(20),
@@ -62,7 +251,7 @@ class ProductDetailScreen extends StatelessWidget {
                 children: [
                   // CATEGORY
                   Text(
-                    product['category'],
+                    product['category'].toString(),
                     style: const TextStyle(
                       color: orange,
                       fontWeight: FontWeight.bold,
@@ -74,7 +263,7 @@ class ProductDetailScreen extends StatelessWidget {
 
                   // PRODUCT NAME
                   Text(
-                    product['name'],
+                    product['name'].toString(),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -94,7 +283,7 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        product['location'],
+                        product['location'].toString(),
                         style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -108,6 +297,8 @@ class ProductDetailScreen extends StatelessWidget {
                   const Divider(),
 
                   const SizedBox(height: 15),
+
+                  // AVAILABILITY
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -146,6 +337,8 @@ class ProductDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: 15),
 
                   // PRICE
                   const Text(
@@ -209,6 +402,15 @@ class ProductDetailScreen extends StatelessWidget {
                     ),
                   ),
 
+                  const SizedBox(height: 25),
+
+                  const Divider(),
+
+                  const SizedBox(height: 20),
+
+                  // CUSTOMER REVIEWS
+                  buildCustomerReviews(),
+
                   const SizedBox(height: 30),
                 ],
               ),
@@ -216,8 +418,6 @@ class ProductDetailScreen extends StatelessWidget {
           ],
         ),
       ),
-
-      // RENT BUTTON
 
       // BOTTOM BUTTONS
       bottomNavigationBar: SafeArea(
