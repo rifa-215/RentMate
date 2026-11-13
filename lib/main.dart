@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'screen/splash_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://akjpmkpnsqsoyeegmoki.supabase.co',
+    publishableKey: 'sb_publishable_3YRIttqIHkWh2L3WWTAqaA_45esGnmG',
+  );
+
   runApp(const RentMateApp());
 }
 
