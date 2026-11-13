@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'rental_confirm.dart';
 import 'rental_data.dart';
-import 'notification_data.dart';
+import 'user_data.dart';
 
 class RentalRequestScreen extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -17,12 +17,38 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
 
+  Widget customerInfo(IconData icon, String title, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: orange, size: 20),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontSize: 11, color: Colors.grey),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: black,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   DateTime? startDate;
   DateTime? endDate;
-
-  final nameController = TextEditingController();
-  final phoneController = TextEditingController();
-  final addressController = TextEditingController();
 
   String? deliveryMethod;
   String? paymentMethod;
@@ -89,22 +115,19 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
 
   @override
   void dispose() {
-    nameController.dispose();
-    phoneController.dispose();
-    addressController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = UserData.currentUser;
+
     final canSubmit =
+        user != null &&
         startDate != null &&
         endDate != null &&
         deliveryMethod != null &&
-        paymentMethod != null &&
-        nameController.text.trim().isNotEmpty &&
-        phoneController.text.trim().isNotEmpty &&
-        addressController.text.trim().isNotEmpty;
+        paymentMethod != null;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -165,56 +188,41 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
 
                     const SizedBox(height: 15),
 
-                    TextField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Full Name',
-                        prefixIcon: const Icon(
-                          Icons.person_outline,
-                          color: orange,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF3E8),
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      onChanged: (_) => setState(() {}),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    TextField(
-                      controller: phoneController,
-                      keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        labelText: 'Phone Number',
-                        prefixIcon: const Icon(
-                          Icons.phone_outlined,
-                          color: orange,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          customerInfo(
+                            Icons.person_outline,
+                            'Full Name',
+                            user?['name'] ?? '-',
+                          ),
+                          const SizedBox(height: 12),
+                          customerInfo(
+                            Icons.email_outlined,
+                            'Email Address',
+                            user?['email'] ?? '-',
+                          ),
+                          const SizedBox(height: 12),
+                          customerInfo(
+                            Icons.phone_outlined,
+                            'Phone Number',
+                            user?['phone'] ?? '-',
+                          ),
+                          const SizedBox(height: 12),
+                          customerInfo(
+                            Icons.location_on_outlined,
+                            'Address',
+                            user?['address'] ?? '-',
+                          ),
+                        ],
                       ),
-                      onChanged: (_) => setState(() {}),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    TextField(
-                      controller: addressController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        labelText: 'Address',
-                        alignLabelWithHint: true,
-                        prefixIcon: const Icon(
-                          Icons.location_on_outlined,
-                          color: orange,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onChanged: (_) => setState(() {}),
                     ),
 
                     const SizedBox(height: 30),
@@ -413,6 +421,10 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
                   onPressed: canSubmit
                       ? () {
                           // Simpan data rental
+                          final currentUser = UserData.currentUser;
+
+                          if (currentUser == null) return;
+
                           RentalData.addRental(
                             product: widget.product,
                             startDate: startDate!,
@@ -421,12 +433,10 @@ class _RentalRequestScreenState extends State<RentalRequestScreen> {
                             deliveryMethod: deliveryMethod!,
                             paymentMethod: paymentMethod!,
                             totalPrice: totalPrice,
-                            customerName: nameController.text.trim(),
-                            customerPhone: phoneController.text.trim(),
-                            customerAddress: addressController.text.trim(),
-                          );
-                          debugPrint(
-                            'JUMLAH NOTIFIKASI: ${NotificationData.notifications.length}',
+                            customerName: currentUser['name'] ?? '',
+                            customerEmail: currentUser['email'] ?? '',
+                            customerPhone: currentUser['phone'] ?? '',
+                            customerAddress: currentUser['address'] ?? '',
                           );
 
                           // Buka halaman konfirmasi

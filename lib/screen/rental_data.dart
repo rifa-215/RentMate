@@ -12,6 +12,7 @@ class RentalData {
     required String paymentMethod,
     required int totalPrice,
     required String customerName,
+    required String customerEmail,
     required String customerPhone,
     required String customerAddress,
   }) {
@@ -28,9 +29,11 @@ class RentalData {
       'rating': null,
       'review': '',
       'customerName': customerName,
+      'customerEmail': customerEmail,
       'customerPhone': customerPhone,
       'customerAddress': customerAddress,
     });
+
     NotificationData.addNotification(
       title: 'New Rental Request',
       message:
@@ -38,21 +41,6 @@ class RentalData {
       recipient: 'owner',
     );
 
-    NotificationData.addNotification(
-      title: 'Rental Request Sent',
-      message:
-          'Your rental request for ${product['name']} has been sent successfully.',
-      recipient: 'renter',
-    );
-
-    // Notifikasi untuk owner
-    NotificationData.addNotification(
-      title: 'New Rental Request',
-      message: 'You have received a new rental request for ${product['name']}.',
-      recipient: 'owner',
-    );
-
-    // Notifikasi untuk pelanggan
     NotificationData.addNotification(
       title: 'Rental Request Sent',
       message:

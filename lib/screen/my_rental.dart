@@ -16,6 +16,10 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
   static const Color orange = Color(0xFFFF8A00);
   static const Color black = Color(0xFF171717);
 
+  String selectedFilter = 'All';
+
+  final List<String> filters = ['All', 'Pending', 'Approved', 'Rejected'];
+
   String formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
@@ -35,16 +39,119 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
     }
   }
 
+  Widget buildFilterButton(String filter) {
+    final isSelected = selectedFilter == filter;
+
+    return Expanded(
+      child: SizedBox(
+        height: 40,
+        child: ElevatedButton(
+          onPressed: () {
+            setState(() {
+              selectedFilter = filter;
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isSelected ? orange : const Color(0xFFFFF3E8),
+            foregroundColor: isSelected ? Colors.white : black,
+            elevation: 0,
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Text(
+            filter,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget detailRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: black,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget emptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.inventory_2_outlined,
+              size: 75,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'No Rentals Yet',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Your rental requests will appear here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final rentals = RentalData.rentals;
+
+    // Filter transaksi berdasarkan status.
+    // Indeks asli tetap disimpan untuk fitur Review.
+    final filteredRentals = rentals.asMap().entries.where((entry) {
+      final status = entry.value['status']?.toString() ?? 'Pending';
+
+      if (selectedFilter == 'All') {
+        return true;
+      }
+
+      return status == selectedFilter;
+    }).toList();
+
+    // Transaksi terbaru ditampilkan paling atas.
+    // RentalData menggunakan rentals.add(), sehingga indeks
+    // paling besar merupakan transaksi terbaru.
+    filteredRentals.sort((a, b) => b.key.compareTo(a.key));
 
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // HEADER
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 25, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
             child: Row(
               children: [
                 IconButton(
@@ -65,46 +172,43 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
               ],
             ),
           ),
+
+          // FILTER BUTTONS
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                buildFilterButton('All'),
+                const SizedBox(width: 7),
+                buildFilterButton('Pending'),
+                const SizedBox(width: 7),
+                buildFilterButton('Approved'),
+                const SizedBox(width: 7),
+                buildFilterButton('Rejected'),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          // RENTAL LIST
           Expanded(
-            child: rentals.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(30),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.inventory_2_outlined,
-                            size: 75,
-                            color: Colors.grey.shade400,
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            'No Rentals Yet',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: black,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Your rental requests will appear here.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
+            child: filteredRentals.isEmpty
+                ? emptyState()
                 : ListView.builder(
                     padding: const EdgeInsets.all(20),
-                    itemCount: rentals.length,
+                    itemCount: filteredRentals.length,
                     itemBuilder: (context, index) {
-                      final rental = rentals[index];
+                      final entry = filteredRentals[index];
+
+                      // Indeks asli untuk menyimpan Review.
+                      final rentalIndex = entry.key;
+                      final rental = entry.value;
+
                       final product = rental['product'] as Map<String, dynamic>;
 
                       final status = rental['status']?.toString() ?? 'Pending';
+
                       final color = statusColor(status);
 
                       return Container(
@@ -118,6 +222,7 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // PRODUCT NAME & STATUS
                             Row(
                               children: [
                                 Expanded(
@@ -151,28 +256,37 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
                                 ),
                               ],
                             ),
+
                             const SizedBox(height: 15),
+
                             detailRow(
                               'Start Date',
                               formatDate(rental['startDate'] as DateTime),
                             ),
+
                             detailRow(
                               'End Date',
                               formatDate(rental['endDate'] as DateTime),
                             ),
+
                             detailRow(
                               'Duration',
                               '${rental['rentalDays']} day(s)',
                             ),
+
                             detailRow(
                               'Delivery',
                               rental['deliveryMethod'].toString(),
                             ),
+
                             detailRow(
                               'Payment',
                               rental['paymentMethod'].toString(),
                             ),
+
                             const Divider(height: 25),
+
+                            // TOTAL PAYMENT
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -193,77 +307,10 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-
-                                if (status == 'Approved' &&
-                                    rental['hasReviewed'] != true) ...[
-                                  const SizedBox(height: 15),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 45,
-                                    child: ElevatedButton(
-                                      onPressed: () async {
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => ReviewScreen(
-                                              productName: product['name']
-                                                  .toString(),
-                                              rentalIndex: index,
-                                            ),
-                                          ),
-                                        );
-
-                                        setState(() {});
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: orange,
-                                        foregroundColor: Colors.white,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Give Review',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-
-                                if (rental['hasReviewed'] == true) ...[
-                                  const SizedBox(height: 15),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.check_circle,
-                                        color: Colors.green,
-                                        size: 18,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Text(
-                                        'Reviewed',
-                                        style: TextStyle(
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        '${rental['rating']} / 5 ⭐',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
                               ],
                             ),
+
+                            // GIVE REVIEW
                             if (status == 'Approved' &&
                                 rental['hasReviewed'] != true) ...[
                               const SizedBox(height: 15),
@@ -278,7 +325,7 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
                                         builder: (context) => ReviewScreen(
                                           productName: product['name']
                                               .toString(),
-                                          rentalIndex: index,
+                                          rentalIndex: rentalIndex,
                                         ),
                                       ),
                                     );
@@ -303,6 +350,7 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
                               ),
                             ],
 
+                            // REVIEWED STATUS
                             if (rental['hasReviewed'] == true) ...[
                               const SizedBox(height: 15),
                               Row(
@@ -335,26 +383,6 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
                       );
                     },
                   ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget detailRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-          Text(
-            value,
-            style: const TextStyle(
-              color: black,
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
           ),
         ],
       ),

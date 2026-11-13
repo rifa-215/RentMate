@@ -5,6 +5,10 @@ import 'create_store.dart';
 import 'store_data.dart';
 import 'user_data.dart';
 
+import 'dart:io';
+
+import 'edit_profile.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -59,16 +63,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 25),
 
                         // INFORMASI PENGGUNA
+                        // INFORMASI PENGGUNA
                         Row(
                           children: [
-                            const CircleAvatar(
+                            CircleAvatar(
                               radius: 32,
-                              backgroundColor: Color(0xFFFFF3E8),
-                              child: Icon(
-                                Icons.person,
-                                size: 38,
-                                color: orange,
-                              ),
+                              backgroundColor: const Color(0xFFFFF3E8),
+                              backgroundImage:
+                                  user?['profileImage'] != null &&
+                                      user!['profileImage']!.isNotEmpty
+                                  ? FileImage(File(user['profileImage']!))
+                                  : null,
+                              child:
+                                  user?['profileImage'] == null ||
+                                      user!['profileImage']!.isEmpty
+                                  ? const Icon(
+                                      Icons.person,
+                                      size: 38,
+                                      color: orange,
+                                    )
+                                  : null,
                             ),
                             const SizedBox(width: 15),
                             Expanded(
@@ -96,44 +110,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
 
-                        // DETAIL PENGGUNA
-                        Container(
+                        // EDIT PROFILE BUTTON
+                        SizedBox(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF3E8),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Personal Information',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: black,
+                          child: OutlinedButton.icon(
+                            onPressed: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const EditProfileScreen(),
                                 ),
+                              );
+
+                              setState(() {});
+                            },
+                            icon: const Icon(Icons.edit_outlined, size: 18),
+                            label: const Text('Edit Profile'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: orange,
+                              side: const BorderSide(color: orange),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              const SizedBox(height: 15),
-                              _userInfo(
-                                Icons.phone_outlined,
-                                'Phone Number',
-                                user?['phone'] ?? '-',
-                              ),
-                              const SizedBox(height: 12),
-                              _userInfo(
-                                Icons.location_on_outlined,
-                                'Address',
-                                user?['address'] ?? '-',
-                              ),
-                            ],
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
                           ),
                         ),
 
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 20),
 
                         // TOKO SAYA
                         _profileMenu(
@@ -241,36 +248,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           );
-  }
-
-  Widget _userInfo(IconData icon, String title, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: orange, size: 20),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(color: Colors.grey, fontSize: 11),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: black,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _profileMenu({

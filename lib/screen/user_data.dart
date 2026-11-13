@@ -22,6 +22,7 @@ class UserData {
       'password': password,
       'phone': phone,
       'address': address,
+      'profileImage': '',
     };
 
     users.add(newUser);
@@ -38,7 +39,6 @@ class UserData {
         return true;
       }
     }
-
     return false;
   }
 
@@ -46,15 +46,31 @@ class UserData {
     currentUser = null;
   }
 
-  static void updateProfile({
+  static bool updateProfile({
     required String name,
+    required String email,
     required String phone,
     required String address,
+    required String password,
+    required String profileImage,
   }) {
-    if (currentUser == null) return;
+    if (currentUser == null) return false;
+
+    final emailExists = users.any(
+      (user) =>
+          user != currentUser &&
+          user['email']!.toLowerCase() == email.toLowerCase(),
+    );
+
+    if (emailExists) return false;
 
     currentUser!['name'] = name;
+    currentUser!['email'] = email;
     currentUser!['phone'] = phone;
     currentUser!['address'] = address;
+    currentUser!['password'] = password;
+    currentUser!['profileImage'] = profileImage;
+
+    return true;
   }
 }
